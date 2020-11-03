@@ -47,7 +47,7 @@ class html_parser():
                     currHtml = currHtml + str(currNode.text)
 
 
-            f = open("../out/"+value.get('file_name'), "w")
+            f = open("../res/out/"+value.get('file_name'), "w")
             f.write(currHtml)
             f.close()           
 

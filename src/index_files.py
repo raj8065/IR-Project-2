@@ -84,5 +84,5 @@ def gen_index(folder_path):
 			
 
 
-gen_index("out")
+gen_index("res/out")
 #print(get_doc_lookup_table("res/doc_lookup.tsv"))
