@@ -60,6 +60,10 @@ def get_word_stem(word):
 	return snowball_stemmer.stem(word)
 
 
+def preprocess_word(word):
+	word = word.lower()
+	word_without_punctuation = re.sub(r'[^\w\s]', '', word)
+	return word_without_punctuation
 
 def gen_index(folder_path):
 
@@ -76,7 +80,7 @@ def gen_index(folder_path):
 			source_code = episode_transcript.read()
 			for word in source_code.split():
 				# TODO remove punctuation in word
-				word = word.lower()
+				word = preprocess_word(word)
 				stem = get_word_stem(word)
 				
 				if not inverted_index.get(stem):
