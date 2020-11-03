@@ -9,6 +9,9 @@ class posting():
     def __init__(self):
         self.posting_list = {}
 
+    def get_posting_list(self):
+    	return self.posting_list
+
     def record_instance_of_word(self, doc_id):
     	if not self.posting_list.get(doc_id):
     		self.posting_list[doc_id] = 1
@@ -34,6 +37,21 @@ def get_doc_lookup_table(rel_path):
 	
 	
 	return doc_lookup_table
+
+
+def write_index_to_tsv(inverted_index):
+	index_file = os.path.join(os.path.dirname(os.getcwd())+"\\res\\inverted_index.tsv")
+	with open(index_file, 'w') as out_file:
+		tsv_writer = csv.writer(out_file, delimiter='\t')
+		#tsv_writer.writerow(['Keyword', 'Number of Postings', 'Document Ids', 'Frequency'])
+		for key,value in sorted(inverted_index.items()):
+			posting = [key, inverted_index.get(key).get_posting_list()]
+			for key, value in inverted_index[key].get_posting_list().items():
+				# flatten posting dict into list
+				posting.append(key)
+				posting.append(value)
+		
+			tsv_writer.writerow(posting)
 
 
 snowball_stemmer = SnowballStemmer("english")
@@ -74,6 +92,7 @@ def gen_index(folder_path):
 	
 	# for (key, value) in inverted_index.items(): # FOR TESTING PURPOSES 
 	# 	print(key, value)
+	return inverted_index
 
 
 
@@ -84,5 +103,6 @@ def gen_index(folder_path):
 			
 
 
-gen_index("out")
+inverted_index = gen_index("out")
 #print(get_doc_lookup_table("res/doc_lookup.tsv"))
+write_index_to_tsv(inverted_index)

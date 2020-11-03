@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 import re
 import csv
+import os
 
 class html_parser():
 
@@ -46,14 +47,15 @@ class html_parser():
                 else:
                     currHtml = currHtml + str(currNode.text)
 
-
-            f = open("../out/"+value.get('file_name'), "w")
+            file_path = os.path.dirname(os.getcwd())+"\\"+"out" + "\\" + value.get('file_name')
+            f = open(file_path, "w")
             f.write(currHtml)
             f.close()           
 
 
     def write_doc_table_to_tsv(self):
-        with open('../res/doc_lookup.tsv', 'w') as out_file:
+        file_path = os.path.dirname(os.getcwd())+"\\"+"res" + "\\doc_lookup.tsv"
+        with open(file_path, 'w') as out_file:
             tsv_writer = csv.writer(out_file, delimiter='\t')
             for key,value in self.doc_lookup_table.items():
                 tsv_writer.writerow([key,
