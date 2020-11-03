@@ -103,9 +103,6 @@ def gen_index(folder_path):
 
 			
 		
-		
-			
-
 
 inverted_index = gen_index("out")
 #print(get_doc_lookup_table("res/doc_lookup.tsv"))
