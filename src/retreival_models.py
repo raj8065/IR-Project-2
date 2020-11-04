@@ -93,25 +93,32 @@ class TfIdfModel(RetrievalModel):
 
 def BM25Model(RetrievalModel):
 
-    def __init__(self, doc_num, data, documents, k_1, k_2, b, avr_doc_length):
+    def __init__(self, doc_num, data, documents, avr_doc_length):
         super.__init__(self, doc_num, data, documents)
-        self.k_1 = k_1
-        self.k_2 = k_2
-        self.b = b
+        self.k_1 = 1.2
+        self.k_2 = 100
+        self.b = 0.75
         self.avr_doc_length = avr_doc_length
 
-    # TODO Get the document's length
-    def get_doc_length(self, doc):
-        return 0
+    # Gets the document's length AKA the total number of word occurances
+    def get_doc_length(self, data, doc):
+
+        doc_length = 0
+        for term in data:
+            doc_length += self.get_number_of_term_in_document(term, doc)
+
+        return doc_length
 
     # Calculates K for BM25
     def calculate_K(self, doc):
         doc_length = get_doc_length(doc)
         return self.k_1*((1-self.b) + (self.b * (doc_length/self.avr_doc_length)))
 
+    # Gets the query relevance, we don't know the relevance information so we return 0
     def get_query_relevance(self):
         return 0
 
+    # Gets the number of relevant queries, we don't know the relevance information so we return 0
     def get_number_of_relevant(self):
         return 0
 
