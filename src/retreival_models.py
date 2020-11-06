@@ -12,20 +12,18 @@ class RetrievalModel():
     def get_number_of_documents(self):
         return self.doc_num
 
-    # TODO change depending on datamodel
     # Returns a list of all the documents
     def get_all_documents(self):
-        return self.documents
+        return self.documents.keys
 
-    # TODO change depending on datamodel
     # Returns all of the documents for a term
     def get_documents_for_term(self, term):
-        return self.data[term]
+        return self.data[term][0].keys
 
     # TODO change depending on datamodel
     # Returns the number of occurrences of the term in the document AKA f_ik
     def get_number_of_term_in_document(self, term, doc):
-        return self.data[term][doc]
+        return self.data[term][0][1]
 
     # TODO change depending on datamodel
     # Returns the id of the document
