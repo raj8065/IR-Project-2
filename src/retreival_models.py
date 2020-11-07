@@ -1,32 +1,29 @@
 import math
 
+class RetrievalModel():
 
-class RetrievalModel:
-
-    def __init__(self, doc_num, data, documents):
+    def __init__(self, data, documents):
         self.data = data
         self.documents = documents
-        self.doc_num = doc_num  # Number of documents
+        self.doc_num = len(documents)  # Number of documents
         self.document_with_term_occurrences = dict()  # Cache so calculations can be done quicker
 
     # Returns the total number of documents AKA N
     def get_number_of_documents(self):
         return self.doc_num
 
-    # TODO change depending on datamodel
     # Returns a list of all the documents
     def get_all_documents(self):
-        return self.documents
+        return self.documents.keys
 
-    # TODO change depending on datamodel
     # Returns all of the documents for a term
     def get_documents_for_term(self, term):
-        return self.data[term]
+        return self.data[term][0].keys
 
     # TODO change depending on datamodel
     # Returns the number of occurrences of the term in the document AKA f_ik
     def get_number_of_term_in_document(self, term, doc):
-        return self.data[term][doc]
+        return self.data[term][0][1]
 
     # TODO change depending on datamodel
     # Returns the id of the document
@@ -91,14 +88,18 @@ class TfIdfModel(RetrievalModel):
         return math.sqrt(total)
 
 
-def BM25Model(RetrievalModel):
+class BM25Model(RetrievalModel):
 
-    def __init__(self, doc_num, data, documents, avr_doc_length):
-        super.__init__(self, doc_num, data, documents)
+    def __init__(self, data, documents):
+        super().__init__(data, documents)
         self.k_1 = 1.2
         self.k_2 = 100
         self.b = 0.75
-        self.avr_doc_length = avr_doc_length
+        self.avr_doc_length = self.get_average_document_length()
+
+    # TODO change depending on datamodel
+    def get_average_document_length(self):
+        return 1
 
     # Gets the document's length AKA the total number of word occurances
     def get_doc_length(self, data, doc):
