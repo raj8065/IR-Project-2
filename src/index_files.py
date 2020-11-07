@@ -9,14 +9,24 @@ import re
 
 class posting():
 
-    def __init__(self):
+    def __init__(self):      
         self.posting_list = {}
+
+    def populate_posting_list_from_array(self, posting_list_str):
+        posting_list = posting_list_str.split("\t")
+
+        for idx in range(2,len(posting_list)-1, 2):
+            # elements 0 and 1 are the word itself and n_postings
+            doc_id = int(posting_list[idx].replace("\'", ""))
+            doc_freq = int(posting_list[idx+1].replace("\'", ""))
+            self.posting_list[doc_id] = doc_freq
+                  
 
     def get_posting_list(self):
         return self.posting_list
 
     def get_n_postings(self):
-    	return len(self.posting_list)
+        return len(self.posting_list)
 
     def record_instance_of_word(self, doc_id):
         if not self.posting_list.get(doc_id):
@@ -25,38 +35,26 @@ class posting():
             self.posting_list[doc_id] = self.posting_list[doc_id] + 1
 
     def __str__(self):
-        return "Posting(posting_list=" + self.posting_list.__str__() + ")"
+        return "Posting(posting_list="+self.posting_list.__str__() + ")"
 
-
-def get_doc_lookup_table(rel_path):
-    doc_lookup_table = {}
-    doc_lookup_file = os.path.join(os.path.dirname(os.getcwd()) + "\\" + rel_path)
-    with open(doc_lookup_file, 'r') as f:
-        idx_data = csv.reader(f, delimiter="\t", quotechar='"')
-        for row in idx_data:
-            if row == []:
-                # weed out empty rows
-                continue
-
-            doc_lookup_table[int(row[0])] = {"heading_id": row[1], "file_name": row[2]}
 
     return doc_lookup_table
 
 def write_index_to_tsv(inverted_index):
-	index_file = os.path.join(os.path.dirname(os.getcwd())+"\\res\\inverted_index.tsv")
-	with open(index_file, 'w') as out_file:
-		tsv_writer = csv.writer(out_file, delimiter='\t')
-		#tsv_writer.writerow(['Keyword', 'Number of Postings', 'Document Ids', 'Frequency'])
-		for key,value in sorted(inverted_index.items()):
-			posting = [key]
-			p_list = inverted_index[key].get_posting_list()			
-			posting.append(inverted_index[key].get_n_postings())
-			for key, value in p_list.items():
-				# flatten posting dict into list
-				posting.append(key)
-				posting.append(value)
-		
-			tsv_writer.writerow(posting)
+  index_file = os.path.join(os.path.dirname(os.getcwd())+"\\res\\inverted_index.tsv")
+  with open(index_file, 'w') as out_file:
+      tsv_writer = csv.writer(out_file, delimiter='\t')
+      #tsv_writer.writerow(['Keyword', 'Number of Postings', 'Document Ids', 'Frequency'])
+      for key,value in sorted(inverted_index.items()):
+          posting = [key]
+          p_list = inverted_index[key].get_posting_list()         
+          posting.append(inverted_index[key].get_n_postings())
+          for key, value in p_list.items():
+              # flatten posting dict into list
+              posting.append(key)
+              posting.append(value)
+        
+          tsv_writer.writerow(posting)
 
 snowball_stemmer = SnowballStemmer("english")
 
@@ -102,6 +100,7 @@ def clean_input(text):
     return clean_terms
 
 def preprocess_word(word):
+
 	word = word.lower()
 	word_alpha_num = re.sub('[^A-Za-z0-9]+', '', word)
 	return word_alpha_num
