@@ -128,14 +128,6 @@ class BM25Model(RetrievalModel):
         doc_length = self.get_doc_length(doc)
         return self.k_1*((1-self.b) + (self.b * (doc_length/self.avr_doc_length)))
 
-    # Gets the query relevance, we don't know the relevance information so we return 0
-    def get_query_relevance(self):
-        return 0
-
-    # Gets the number of relevant queries, we don't know the relevance information so we return 0
-    def get_number_of_relevant(self):
-        return 0
-
     # calculates the value for a single query word
     def calculate_query_term_value(self, term, doc, query_words):
         # Query word frequency
@@ -146,8 +138,6 @@ class BM25Model(RetrievalModel):
 
         # Calculate variables for equation
         K = self.calculate_K(doc)
-        r_i = self.get_query_relevance()
-        R = self.get_number_of_relevant()
         n_i = self.get_number_of_document_with_term(term)
         f_i = self.get_number_of_term_in_document(term, doc)
         N = self.get_number_of_documents()
