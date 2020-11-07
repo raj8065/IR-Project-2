@@ -51,9 +51,10 @@ def trim_word(word):
     # Generates the capture group(s)
     capture_groups = re.search(reg_ex, word)
     if capture_groups is None:
+        return word
         raise Exception("Word was trimmed and no capture groups were created. WORD: ", word)
     if capture_groups.lastindex > 1:
-        raise Exception("There was more than 1 capture group for wa word. WORD: ", word)
+        raise Exception("There was more than 1 capture group for a word. WORD: ", word)
     return capture_groups.group(1)
 
 
