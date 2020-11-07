@@ -152,9 +152,7 @@ class BM25Model(RetrievalModel):
         f_i = self.get_number_of_term_in_document(term, doc)
         N = self.get_number_of_documents()
 
-        part_1_num = (r_i + 0.5)/(R - r_i + 0.5)
-        part_1_denom = (n_i - r_i + 0.5)/(N - n_i - R + r_i + 0.5)
-        part_1 = math.log10(part_1_num/part_1_denom)
+        part_1 = math.log10(N / n_i)
         part_2 = ((self.k_1 + 1) * f_i)/(K + f_i)
         part_3 = ((self.k_2 + 1)*qf_i)/(self.k_2 + qf_i)
 

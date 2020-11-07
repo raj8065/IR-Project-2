@@ -38,8 +38,6 @@ class posting():
         return "Posting(posting_list="+self.posting_list.__str__() + ")"
 
 
-    return doc_lookup_table
-
 def write_index_to_tsv(inverted_index):
   index_file = os.path.join(os.path.dirname(os.getcwd())+"\\res\\inverted_index.tsv")
   with open(index_file, 'w') as out_file:
