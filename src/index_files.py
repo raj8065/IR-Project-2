@@ -33,29 +33,20 @@ def get_word_stem(word):
 
 
 def trim_word(word):
-    # The characters we don't want in the beginning/end of the word
-    removal_characters = "\]\[:,;\'\"”“\s?!.�\-"
-    # The characters we want to allow as the characters of the word
-    tar_char = "[\wâ€Ã©]"
+    if re.match("[\w\d]+", word):
 
-    # Checks if the inputted word has any desired characters
-    target_characters = re.search(tar_char, word)
-    if target_characters is None:
-        return ""
+        new_word = re.sub('[^\w\d\-]+', '', word)
+        new_word = re.sub(r'[â]*([\w\d\-]+)[â]*', r'\1', new_word)
 
-    # Generates the possible words that we want to keep
-    target_word = "(" + tar_char + "+[\'-]+" + tar_char + "*[\'-]*" + tar_char + "+|" + tar_char + "+)"
-    # Generates the regex to parse the input
-    reg_ex = "^[" + removal_characters + "]*" + target_word + "[" + removal_characters + "]*$"
-
-    # Generates the capture group(s)
-    capture_groups = re.search(reg_ex, word)
-    if capture_groups is None:
-        return word
-        raise Exception("Word was trimmed and no capture groups were created. WORD: ", word)
-    if capture_groups.lastindex > 1:
-        raise Exception("There was more than 1 capture group for a word. WORD: ", word)
-    return capture_groups.group(1)
+        if re.match("[\w\d]+", new_word):
+            # Generates the capture group(s)
+            capture_groups = re.search(("[-]*([\w\d]+[\w\d\-]*[\w\d]+|[\w\d]+)[-]*"), new_word)
+            if capture_groups is None:
+                raise Exception("Word was trimmed and no capture groups were created. WORD: ", new_word)
+            if capture_groups.lastindex > 1:
+                raise Exception("There was more than 1 capture group for a word. WORD: ", new_word)
+            return capture_groups.group(1)
+    return ""
 
 
 # Splits text into parts then for each part it trims it, strips it, puts it in lowercase and stems it
@@ -63,7 +54,7 @@ def clean_input(text):
     clean_terms = []
 
     # Split the text at these characters ...
-    text_parts = re.split(" |”|\n|\[|\[", text)
+    text_parts = re.split(" |\n|\xa0", text)
 
     # Process each term
     for part in text_parts:
@@ -106,9 +97,6 @@ def gen_index(folder_path):
                     inverted_index[term] = posting()
                 inverted_index[term].record_instance_of_word(doc_id)
 
-        ctr = ctr + 1
-        # if ctr == 1:  # FOR TESTING PURPOSES
-        #     break
 
     # for (key, value) in inverted_index.items(): # FOR TESTING PURPOSES
     # 	print(key, value)

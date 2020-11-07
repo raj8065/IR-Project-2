@@ -16,7 +16,6 @@ class html_parser():
             self.soup = BeautifulSoup(fp, 'html5lib')
 
     def populate_doc_lookup_table(self):
-        #with open("../res/first_five.html") as fp:
         with open(self.transcript_doc) as fp:
             
             data = self.soup.find('div',attrs={'id':"transcripts-toc"})
@@ -45,7 +44,8 @@ class html_parser():
                 else:
                     currHtml = currHtml + str(currNode.text)
 
-            file_path = os.path.dirname(os.getcwd())+"\\"+"res\\out" + "\\" + value.get('file_name')
+
+            file_path = os.path.dirname(os.getcwd())+"\\res\\"+"out" + "\\" + value.get('file_name')
             f = open(file_path, "w")
             f.write(currHtml)
             f.close()           

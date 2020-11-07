@@ -8,11 +8,9 @@ from retreival_models import TfIdfModel
 from tsv_reader import Tsv_Reader
 from retreival_models import *
 
-
 # TODO Generate a html file for search results
 def generate_search_results(rankings, filename):
     return None
-
 
 def main():
 
@@ -29,6 +27,9 @@ def main():
 
         BM25_rankings = BM25_model.generate_ranks(query_parts)
         TF_IDF_rankings = TF_IDF_model.generate_ranks(query_parts)
+
+        print(BM25_rankings)
+        print(TF_IDF_rankings)
 
         generate_search_results(BM25_rankings, "BM25_results.html")
         generate_search_results(TF_IDF_rankings, "TF_IDF_results.html")
