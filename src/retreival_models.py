@@ -3,10 +3,9 @@ import math
 class RetrievalModel():
 
     def __init__(self, data, documents):
-        self.data = data
-        self.documents = documents
+        self.inv_index = data
+        self.doc_posting = documents
         self.doc_num = len(documents)  # Number of documents
-        self.document_with_term_occurrences = dict()  # Cache so calculations can be done quicker
 
     # Returns the total number of documents AKA N
     def get_number_of_documents(self):
@@ -14,39 +13,34 @@ class RetrievalModel():
 
     # Returns a list of all the documents
     def get_all_documents(self):
-        return self.documents.keys
+        return self.doc_posting.keys()
 
     # Returns all of the documents for a term
     def get_documents_for_term(self, term):
-        return self.data[term][0].keys
+        posting = self.inv_index.get(term)
+        if posting is None:
+            return []
+        return posting.posting_list.keys()
 
-    # TODO change depending on datamodel
     # Returns the number of occurrences of the term in the document AKA f_ik
     def get_number_of_term_in_document(self, term, doc):
-        return self.data[term][0][1]
-
-    # TODO change depending on datamodel
-    # Returns the id of the document
-    def get_document_id(self, doc):
-        return doc[0]
+        posting = self.inv_index.get(term)
+        if posting is None:
+            return 0
+        amnt = self.inv_index[term].posting_list.get(doc)
+        if amnt is None:
+            return 0
+        return amnt
 
     # Returns the number of documents in which the term appears AKA n_k
     def get_number_of_document_with_term(self, term):
-        if term in self.document_with_term_occurrences:
-            return self.document_with_term_occurrences[term]
-
-        sum = 0
-        for doc in self.get_documents_for_term(term):
-            sum = sum + 1
-        self.document_with_term_occurrences[term] = sum
-
-        return sum
+        return len(self.get_documents_for_term(term))
 
     # Generates the ranks for all the documents AKA the main workhorse of the class
     def generate_ranks(self, query_words):
         ranks = dict()
         for doc in self.get_all_documents():
-            ranks[self.get_document_id(doc)] = self.generate_rank(query_words, doc)
+            ranks[doc] = self.generate_rank(query_words, doc)
         return ranks
 
     # Generates a rank for a single document
@@ -56,35 +50,48 @@ class RetrievalModel():
 
 class TfIdfModel(RetrievalModel):
 
+    def __init__(self, data, documents):
+        super().__init__(data, documents)
+
     # Generates a rank for a single document
     def generate_rank(self, query_words, doc):
-        denominator = self.generate_tf_idf_term_rank_denominator(self, doc)
+
+        denominator = self.generate_tf_idf_term_rank_denominator(query_words, doc)
+        # If None of the query terms appear in any document then the rank is zero
+        if denominator == 0:
+            return 0
+
         rank_sum = 0
         for word in query_words:
-            rank_sum = rank_sum + self.generate_tf_idf_term_rank(word, doc, denominator)
+            rank_sum += self.generate_tf_idf_term_rank(word, doc, denominator)
         return rank_sum
 
     # Generates the tf_idf rank for a term - doc pair
     def generate_tf_idf_term_rank(self, term, doc, denominator):
-        return self.generate_tf_idf_term_rank_numerator(self, doc, term) / denominator
+        return self.generate_tf_idf_term_rank_numerator(doc, term) / denominator
 
     # Generates the numerator of the tf_idf rank for a term - doc pair
     def generate_tf_idf_term_rank_numerator(self, doc, term):
-        N = self.get_number_of_documents()
-        n_k = self.get_number_of_document_with_term(term)
         f_ik = self.get_number_of_term_in_document(term, doc)
 
-        return (math.log10(f_ik) + 1.0) * math.log10(N/n_k)
+        # If the term does not appear in the document, no term weight is added
+        if f_ik != 0:
+            N = self.get_number_of_documents()
+            n_k = self.get_number_of_document_with_term(term)
+            return (math.log10(f_ik) + 1.0) * (math.log10(N/n_k))
+        else:
+            return 0
 
     # Generates the denominator of the tf_idf rank for a term - doc pair
     def generate_tf_idf_term_rank_denominator(self, query_words, doc):
         N = self.get_number_of_documents()
         total = 0.0
         for word in query_words:
-            n_k = self.get_number_of_document_with_term(word)
             f_ik = self.get_number_of_term_in_document(word, doc)
-
-            total = total + math.pow((math.log10(f_ik) + 1.0) * math.log10(N/n_k), 2)
+            # If the term does not appear in the document, no term weight is added
+            if f_ik != 0:
+                n_k = self.get_number_of_document_with_term(word)
+                total = total + math.pow((math.log10(f_ik) + 1.0) * (math.log10(N/n_k)), 2)
         return math.sqrt(total)
 
 
@@ -97,22 +104,28 @@ class BM25Model(RetrievalModel):
         self.b = 0.75
         self.avr_doc_length = self.get_average_document_length()
 
-    # TODO change depending on datamodel
+    # Gets the average length of a document
     def get_average_document_length(self):
-        return 1
+        total_sum_of_terms = 0
+        amnt = 0
+        for doc in self.get_all_documents():
+            for term in self.inv_index.keys():
+                total_sum_of_terms += self.get_number_of_term_in_document(term, doc)
+            amnt += 1
+        return total_sum_of_terms / amnt
 
-    # Gets the document's length AKA the total number of word occurances
-    def get_doc_length(self, data, doc):
+    # Gets the document's length AKA the total number of word occurrences
+    def get_doc_length(self, doc):
 
         doc_length = 0
-        for term in data:
+        for term in self.inv_index.keys():
             doc_length += self.get_number_of_term_in_document(term, doc)
 
         return doc_length
 
     # Calculates K for BM25
     def calculate_K(self, doc):
-        doc_length = get_doc_length(doc)
+        doc_length = self.get_doc_length(doc)
         return self.k_1*((1-self.b) + (self.b * (doc_length/self.avr_doc_length)))
 
     # Gets the query relevance, we don't know the relevance information so we return 0
@@ -151,5 +164,5 @@ class BM25Model(RetrievalModel):
     def generate_rank(self, query_words, doc):
         rank_sum = 0
         for term in query_words:
-            rank_sum = calculate_query_term_value(self, term, doc)
+            rank_sum += self.calculate_query_term_value(term, doc, query_words)
         return rank_sum
