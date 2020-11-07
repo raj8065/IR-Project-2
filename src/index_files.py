@@ -4,38 +4,8 @@ import os
 import re
 from nltk.stem.snowball import SnowballStemmer
 from nltk.tokenize import word_tokenize
-import re
-
-
-class posting():
-
-    def __init__(self):      
-        self.posting_list = {}
-
-    def populate_posting_list_from_array(self, posting_list_str):
-        posting_list = posting_list_str.split("\t")
-
-        for idx in range(2,len(posting_list)-1, 2):
-            # elements 0 and 1 are the word itself and n_postings
-            doc_id = int(posting_list[idx].replace("\'", ""))
-            doc_freq = int(posting_list[idx+1].replace("\'", ""))
-            self.posting_list[doc_id] = doc_freq
-                  
-
-    def get_posting_list(self):
-        return self.posting_list
-
-    def get_n_postings(self):
-        return len(self.posting_list)
-
-    def record_instance_of_word(self, doc_id):
-        if not self.posting_list.get(doc_id):
-            self.posting_list[doc_id] = 1
-        else:
-            self.posting_list[doc_id] = self.posting_list[doc_id] + 1
-
-    def __str__(self):
-        return "Posting(posting_list="+self.posting_list.__str__() + ")"
+from tsv_reader import Tsv_Reader
+from posting import posting
 
 
 def write_index_to_tsv(inverted_index):
@@ -74,7 +44,7 @@ def trim_word(word):
             if capture_groups is None:
                 raise Exception("Word was trimmed and no capture groups were created. WORD: ", new_word)
             if capture_groups.lastindex > 1:
-                raise Exception("There was more than 1 capture group for wa word. WORD: ", new_word)
+                raise Exception("There was more than 1 capture group for a word. WORD: ", new_word)
             return capture_groups.group(1)
     return ""
 
@@ -105,7 +75,8 @@ def preprocess_word(word):
 
 def gen_index(folder_path):
     inverted_index = {}
-    doc_lookup_table = get_doc_lookup_table("res/doc_lookup.tsv")  # TODO change to class member
+    tsv_reader = Tsv_Reader("res\\doc_lookup.tsv","")
+    doc_lookup_table = tsv_reader.get_doc_lookup_table()  # TODO change to class member
 
     transcript_folder = os.path.dirname(os.getcwd()) + "\\" + folder_path + "\\"
 
@@ -126,11 +97,16 @@ def gen_index(folder_path):
                     inverted_index[term] = posting()
                 inverted_index[term].record_instance_of_word(doc_id)
 
+
     # for (key, value) in inverted_index.items(): # FOR TESTING PURPOSES
     # 	print(key, value)
     return inverted_index
 
 
-inverted_index = gen_index("res/out")
-# print(get_doc_lookup_table("res/doc_lookup.tsv"))
-write_index_to_tsv(inverted_index)
+def main():
+    inverted_index = gen_index("res/out")
+    # print(get_doc_lookup_table("res/doc_lookup.tsv"))
+    write_index_to_tsv(inverted_index)
+
+if __name__ == "__main__":
+    main()
