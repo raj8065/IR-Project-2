@@ -1,6 +1,7 @@
 import glob
 import csv
 import os
+import re
 from nltk.stem.snowball import SnowballStemmer
 from nltk.tokenize import word_tokenize
 import re
@@ -13,6 +14,9 @@ class posting():
 
     def get_posting_list(self):
         return self.posting_list
+
+    def get_n_postings(self):
+    	return len(self.posting_list)
 
     def record_instance_of_word(self, doc_id):
         if not self.posting_list.get(doc_id):
@@ -38,21 +42,21 @@ def get_doc_lookup_table(rel_path):
 
     return doc_lookup_table
 
-
 def write_index_to_tsv(inverted_index):
-    index_file = os.path.join(os.path.dirname(os.getcwd()) + "\\res\\inverted_index.tsv")
-    with open(index_file, 'w') as out_file:
-        tsv_writer = csv.writer(out_file, delimiter='\t')
-        # tsv_writer.writerow(['Keyword', 'Number of Postings', 'Document Ids', 'Frequency'])
-        for key, value in sorted(inverted_index.items()):
-            posting = [key, inverted_index.get(key).get_posting_list()]
-            for key, value in inverted_index[key].get_posting_list().items():
-                # flatten posting dict into list
-                posting.append(key)
-                posting.append(value)
-
-            tsv_writer.writerow(posting)
-
+	index_file = os.path.join(os.path.dirname(os.getcwd())+"\\res\\inverted_index.tsv")
+	with open(index_file, 'w') as out_file:
+		tsv_writer = csv.writer(out_file, delimiter='\t')
+		#tsv_writer.writerow(['Keyword', 'Number of Postings', 'Document Ids', 'Frequency'])
+		for key,value in sorted(inverted_index.items()):
+			posting = [key]
+			p_list = inverted_index[key].get_posting_list()			
+			posting.append(inverted_index[key].get_n_postings())
+			for key, value in p_list.items():
+				# flatten posting dict into list
+				posting.append(key)
+				posting.append(value)
+		
+			tsv_writer.writerow(posting)
 
 snowball_stemmer = SnowballStemmer("english")
 
@@ -105,6 +109,10 @@ def clean_input(text):
 
     return clean_terms
 
+def preprocess_word(word):
+	word = word.lower()
+	word_alpha_num = re.sub('[^A-Za-z0-9]+', '', word)
+	return word_alpha_num
 
 def gen_index(folder_path):
     inverted_index = {}
