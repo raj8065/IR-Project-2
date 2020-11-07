@@ -22,7 +22,7 @@ def get_inverted_index(rel_path):
 
             inverted_index[row[0]] = [ast.literal_eval(row[1]), row[2], row[3] ]
 
-    return inverted_index
+    return index_files.gen_index("res/out")
 
 # Gets the document lookup created by html_parser.write_doc_table_to_tsv
 def get_doc_lookup(rel_path):
@@ -35,8 +35,8 @@ def generate_search_results(rankings, filename):
 
 def main():
 
-    inv_index = get_inverted_index("res\\out\\inverted_index.tsv")
-    doc_lookup = get_doc_lookup("res\\out\\doc_lookup.tsv")
+    inv_index = get_inverted_index("res\\inverted_index.tsv")
+    doc_lookup = get_doc_lookup("res\\doc_lookup.tsv")
 
     BM25_model = BM25Model(inv_index, doc_lookup)
     TF_IDF_model = TfIdfModel(inv_index, doc_lookup)
@@ -47,6 +47,9 @@ def main():
 
         BM25_rankings = BM25_model.generate_ranks(query_parts)
         TF_IDF_rankings = TF_IDF_model.generate_ranks(query_parts)
+
+        print(BM25_rankings)
+        print(TF_IDF_rankings)
 
         generate_search_results(BM25_rankings, "BM25_results.html")
         generate_search_results(TF_IDF_rankings, "TF_IDF_results.html")

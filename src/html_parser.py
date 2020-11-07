@@ -47,7 +47,7 @@ class html_parser():
                 else:
                     currHtml = currHtml + str(currNode.text)
 
-            file_path = os.path.dirname(os.getcwd())+"\\"+"out" + "\\" + value.get('file_name')
+            file_path = os.path.dirname(os.getcwd())+"\\res\\"+"out" + "\\" + value.get('file_name')
             f = open(file_path, "w")
             f.write(currHtml)
             f.close()           
