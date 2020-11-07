@@ -12,6 +12,16 @@ from retreival_models import *
 def generate_search_results(rankings, filename):
     return None
 
+
+def print_results(results_dict, n_hits, doc_lookup):
+    results_sorted = sorted(results_dict.items(), key=lambda x: x[1], reverse=True)
+    ctr_hits = 0
+    for item in results_sorted:
+        if ctr_hits == n_hits or item[1] == 0:
+            break
+        print(doc_lookup[item[0]].get("file_name"))
+        ctr_hits = ctr_hits + 1
+
 def main():
 
     tsv_reader = Tsv_Reader("res\\doc_lookup.tsv", "res\\inverted_index.tsv")
@@ -28,8 +38,10 @@ def main():
         BM25_rankings = BM25_model.generate_ranks(query_parts)
         TF_IDF_rankings = TF_IDF_model.generate_ranks(query_parts)
 
-        print(BM25_rankings)
-        print(TF_IDF_rankings)
+        print("BM_25 Rankings: ")
+        print_results(BM25_rankings, 60, doc_lookup)
+        print("\nTF-IDF Rankings: ")
+        print_results(TF_IDF_rankings, 60, doc_lookup)
 
         generate_search_results(BM25_rankings, "BM25_results.html")
         generate_search_results(TF_IDF_rankings, "TF_IDF_results.html")
