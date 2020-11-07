@@ -4,41 +4,9 @@ import os
 import re
 from nltk.stem.snowball import SnowballStemmer
 from nltk.tokenize import word_tokenize
-import re
+from tsv_reader import Tsv_Reader
+from posting import posting
 
-
-class posting():
-
-    def __init__(self):      
-        self.posting_list = {}
-
-    def populate_posting_list_from_array(self, posting_list_str):
-        posting_list = posting_list_str.split("\t")
-
-        for idx in range(2,len(posting_list)-1, 2):
-            # elements 0 and 1 are the word itself and n_postings
-            doc_id = int(posting_list[idx].replace("\'", ""))
-            doc_freq = int(posting_list[idx+1].replace("\'", ""))
-            self.posting_list[doc_id] = doc_freq
-                  
-
-    def get_posting_list(self):
-        return self.posting_list
-
-    def get_n_postings(self):
-        return len(self.posting_list)
-
-    def record_instance_of_word(self, doc_id):
-        if not self.posting_list.get(doc_id):
-            self.posting_list[doc_id] = 1
-        else:
-            self.posting_list[doc_id] = self.posting_list[doc_id] + 1
-
-    def __str__(self):
-        return "Posting(posting_list="+self.posting_list.__str__() + ")"
-
-
-    return doc_lookup_table
 
 def write_index_to_tsv(inverted_index):
   index_file = os.path.join(os.path.dirname(os.getcwd())+"\\res\\inverted_index.tsv")
@@ -115,14 +83,14 @@ def preprocess_word(word):
 
 def gen_index(folder_path):
     inverted_index = {}
-    doc_lookup_table = get_doc_lookup_table("res/doc_lookup.tsv")  # TODO change to class member
+    tsv_reader = Tsv_Reader("res\\doc_lookup.tsv","")
+    doc_lookup_table = tsv_reader.get_doc_lookup_table()  # TODO change to class member
 
     transcript_folder = os.path.dirname(os.getcwd()) + "\\" + folder_path + "\\"
 
     ctr = 0
 
     for doc_id in doc_lookup_table.keys():
-        print(doc_id)
         file_name = transcript_folder + doc_lookup_table.get(doc_id)["file_name"]
         with open(file_name, 'r') as episode_transcript:
 
@@ -138,8 +106,8 @@ def gen_index(folder_path):
                 inverted_index[term].record_instance_of_word(doc_id)
 
         ctr = ctr + 1
-        if ctr == 1:  # FOR TESTING PURPOSES
-            break
+        # if ctr == 1:  # FOR TESTING PURPOSES
+        #     break
 
     # for (key, value) in inverted_index.items(): # FOR TESTING PURPOSES
     # 	print(key, value)

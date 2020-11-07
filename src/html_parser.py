@@ -28,8 +28,6 @@ class html_parser():
                 file_name = re.sub(pattern, "", a.contents[0])    
                 self.doc_lookup_table[docId] = {'heading_id': heading_id, 'file_name': file_name}
                 docId = docId + 1
-                # if docId == 30:
-                #     break
 
     def write_transcripts_to_files(self):
         for docId,value in self.doc_lookup_table.items():
@@ -47,7 +45,7 @@ class html_parser():
                 else:
                     currHtml = currHtml + str(currNode.text)
 
-            file_path = os.path.dirname(os.getcwd())+"\\"+"out" + "\\" + value.get('file_name')
+            file_path = os.path.dirname(os.getcwd())+"\\"+"res\\out" + "\\" + value.get('file_name')
             f = open(file_path, "w")
             f.write(currHtml)
             f.close()           
