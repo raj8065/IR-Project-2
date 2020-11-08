@@ -2,7 +2,51 @@ import html
 import os
 import re
 
+import src.index_files
 from src.tsv_reader import Tsv_Reader
+
+
+def generate_hit_summary(query, doc):
+    clean_query = src.index_files.clean_input(query)
+
+    doc_file_name = doc['file_name']
+    f = open(os.path.join(os.path.dirname(os.getcwd())+"\\res\\out\\" + doc_file_name), 'r')
+
+    # Raw file input
+    first_line = None
+    second_line = None
+    third_line = None
+
+    # Cleaned file input
+    first_line_clean = None
+    second_line_clean = None
+    third_line_clean = None
+
+    # Best quote match
+    top_score = None
+    top_score_line = None
+
+    for line in f:
+        if first_line is not None and second_line is not None:
+            # Find the intersection of the query and the lines
+            quote = first_line_clean + second_line_clean + third_line_clean
+            score = len([x for x in quote if x in clean_query])
+
+            # If there is no top score, or if this one is better make it the top
+            if top_score is None or score > top_score:
+                top_score = score
+                top_score_line = "<p>" + first_line + "<p>" + second_line + "<p>" + third_line + ""
+        # Move the raw lines up
+        first_line = second_line
+        second_line = third_line
+        third_line = line
+
+        # Move the clean lines up
+        first_line_clean = second_line_clean
+        second_line_clean = third_line_clean
+        third_line_clean = src.index_files.clean_input(third_line)
+
+    return top_score_line
 
 
 def generate_html_top(file, query):
@@ -17,14 +61,19 @@ def generate_html_bottom(file):
     file.write("")
 
 
-def generate_html_result(file, doc):
+def generate_html_result(file, query, doc):
     title = html.escape(doc['file_name'])
     path = os.path.join("\"..\\out\\" + title + "\"")
 
     # Description under the title
-    description = html.escape("INSERT DESCRIPTION HERE")
+    description = generate_hit_summary(query, doc)
+
     # Bolds targeted query words
-    description = re.sub(r'(query_word)', r'<strong>\1</strong>', description)
+    words = set([src.index_files.trim_word(x) for x in re.split(" |\n|\xa0", query)])
+    if '' in words:
+        words.remove('')
+    print("|".join(words))
+    description = re.sub('\\b(' + "|".join(words) + ')\\b', r'<strong>\1</strong>', description, flags=re.IGNORECASE)
 
     file.write("<h2><a href=" + path + ">")
     file.write(title)
@@ -47,10 +96,11 @@ def generate_html_page(query, top_rankings):
     generate_html_top(f, query)
 
     for doc in top_rankings:
-        generate_html_result(f, doc_lookup[doc])
+        generate_html_result(f, query, doc_lookup[doc])
 
     generate_html_bottom(f)
     f.close()
 
+
 # Test case
-generate_html_page("INSERT_QUERY_HERE",[0,1])
+generate_html_page("The pie is beet red pinkie pie.",[0,1])
