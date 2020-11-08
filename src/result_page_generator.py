@@ -82,16 +82,17 @@ def generate_html_result(file, query, doc):
     file.write("<div>" + description + "</div>")
 
 
-def generate_new_result_file_name(query):
-    name = "".join(x for x in query if x.isalnum() or x is "_" or x is "-")
+def generate_new_result_file_name(file_name_prefix, query):
+    name = "".join(x for x in file_name_prefix if x.isalnum() or x is "_" or x is "-") \
+           + "".join(x for x in query if x.isalnum() or x is "_" or x is "-")
     return os.path.join(os.path.dirname(os.getcwd())+"\\res\\results\\" + name + ".html")
 
 
-def generate_html_page(query, top_rankings):
+def generate_html_page(file_name_prefix, query, top_rankings):
     tsv_reader = Tsv_Reader("res\\doc_lookup.tsv", "res\\inverted_index.tsv")
     doc_lookup = tsv_reader.get_doc_lookup_table()
 
-    f = open(generate_new_result_file_name(query), 'w')
+    f = open(generate_new_result_file_name(file_name_prefix, query), 'w')
 
     generate_html_top(f, query)
 
