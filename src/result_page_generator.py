@@ -50,7 +50,7 @@ def generate_hit_summary(query, doc):
 
 
 def generate_html_top(file, query):
-    top_top = "<div><h1>My Little Pony Script Search Engine</h1><div\"><form><input type=\"text\" size=\"100\" value=\""
+    top_top = "<body style=\"background-color:#D0D0D0;\"><div><h1>My Little Pony Script Search Engine</h1><div\"><form><input type=\"text\" size=\"100\" value=\""
     bottom_top = "\" /><input type=\"submit\" value=\"Submit\" /></form></div></div>"
     file.write(top_top)
     file.write(html.escape(query))
@@ -58,7 +58,7 @@ def generate_html_top(file, query):
 
 
 def generate_html_bottom(file):
-    file.write("")
+    file.write("</body>")
 
 
 def generate_html_result(file, query, doc):
@@ -103,4 +103,4 @@ def generate_html_page(file_name_prefix, query, top_rankings):
 
 if __name__ == "__main__":
     # Test case
-    generate_html_page("BM25", "The pie is beet red, pinkie pie.", [0, 1, 7, 8, 3, 6, 4, 2, 24, 10])
+    generate_html_page("BM25", "The pie is amazing and red, pinkie pie.", [4, 2, 0, 1, 8, 3, 6, 24, 10])
