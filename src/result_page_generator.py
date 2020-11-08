@@ -2,12 +2,12 @@ import html
 import os
 import re
 
-import src.index_files
-from src.tsv_reader import Tsv_Reader
+import index_files
+from tsv_reader import Tsv_Reader
 
 
 def generate_hit_summary(query, doc):
-    clean_query = src.index_files.clean_input(query)
+    clean_query = index_files.clean_input(query)
 
     doc_file_name = doc['file_name']
     f = open(os.path.join(os.path.dirname(os.getcwd())+"\\res\\out\\" + doc_file_name), 'r')
@@ -44,7 +44,7 @@ def generate_hit_summary(query, doc):
         # Move the clean lines up
         first_line_clean = second_line_clean
         second_line_clean = third_line_clean
-        third_line_clean = src.index_files.clean_input(third_line)
+        third_line_clean = index_files.clean_input(third_line)
 
     return top_score_line
 
@@ -69,7 +69,7 @@ def generate_html_result(file, query, doc):
     description = generate_hit_summary(query, doc)
 
     # Bolds targeted query words
-    words = set([src.index_files.trim_word(x) for x in re.split(" |\n|\xa0", query)])
+    words = set([index_files.trim_word(x) for x in re.split(" |\n|\xa0", query)])
     if '' in words:
         words.remove('')
     description = re.sub('\\b(' + "|".join(words) + ')\\b', r'<strong>\1</strong>', description, flags=re.IGNORECASE)
@@ -82,8 +82,8 @@ def generate_html_result(file, query, doc):
 
 
 def generate_new_result_file_name(file_name_prefix, query):
-    name = "".join(x for x in file_name_prefix if x.isalnum() or x is "_" or x is "-") \
-           + "".join(x for x in query if x.isalnum() or x is "_" or x is "-")
+    name = "".join(x for x in file_name_prefix if x.isalnum() or x == "_" or x == "-") \
+           + "".join(x for x in query if x.isalnum() or x == "_" or x == "-")
     return os.path.join(os.path.dirname(os.getcwd())+"\\res\\results\\" + name + ".html")
 
 
@@ -103,4 +103,4 @@ def generate_html_page(file_name_prefix, query, top_rankings):
 
 if __name__ == "__main__":
     # Test case
-    generate_html_page("BM25", "The race is amazing and red, pinkie pie.", [2, 0, 1, 8, 3, 6, 24, 10])
+    generate_html_page("BM25", "We should do the annual Big-Sister-Little-Sister camping trip", [2, 0, 1, 8, 3, 6, 24, 10])

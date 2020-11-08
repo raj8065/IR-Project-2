@@ -3,7 +3,7 @@ import os
 import ast
 
 import index_files
-import src.result_page_generator
+import result_page_generator
 
 from retreival_models import BM25Model
 from retreival_models import TfIdfModel
@@ -18,6 +18,8 @@ def print_results(results_dict, n_hits, doc_lookup):
             break
         print(doc_lookup[item[0]].get("file_name"))
         ctr_hits = ctr_hits + 1
+    sorted_doc_ids = [tup[0] for tup in results_sorted]
+    return sorted_doc_ids
 
 def main():
 
@@ -36,12 +38,12 @@ def main():
         TF_IDF_rankings = TF_IDF_model.generate_ranks(query_parts)
 
         print("BM_25 Rankings: ")
-        print_results(BM25_rankings, 60, doc_lookup)
+        sorted_bm25_results = print_results(BM25_rankings, 60, doc_lookup)
         print("\nTF-IDF Rankings: ")
-        print_results(TF_IDF_rankings, 60, doc_lookup)
+        sorted_tf_idf_results = print_results(TF_IDF_rankings, 60, doc_lookup)
 
-        src.result_page_generator.generate_html_page("TF_IDF_", query, TF_IDF_rankings)
-        src.result_page_generator.generate_html_page("BM25_", query, BM25_rankings)
+        result_page_generator.generate_html_page("TF_IDF_", query, sorted_tf_idf_results)
+        result_page_generator.generate_html_page("BM25_", query, sorted_bm25_results)
 
 
         query = input("Enter Query (Input 'quit' to stop): ").strip()
