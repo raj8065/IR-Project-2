@@ -72,7 +72,6 @@ def generate_html_result(file, query, doc):
     words = set([src.index_files.trim_word(x) for x in re.split(" |\n|\xa0", query)])
     if '' in words:
         words.remove('')
-    print("|".join(words))
     description = re.sub('\\b(' + "|".join(words) + ')\\b', r'<strong>\1</strong>', description, flags=re.IGNORECASE)
 
     file.write("<h2><a href=" + path + ">")
