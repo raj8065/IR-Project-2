@@ -103,4 +103,4 @@ def generate_html_page(file_name_prefix, query, top_rankings):
 
 if __name__ == "__main__":
     # Test case
-    generate_html_page("BM25", "The pie is amazing and red, pinkie pie.", [4, 2, 0, 1, 8, 3, 6, 24, 10])
+    generate_html_page("BM25", "The race is amazing and red, pinkie pie.", [2, 0, 1, 8, 3, 6, 24, 10])

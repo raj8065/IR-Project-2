@@ -3,15 +3,12 @@ import os
 import ast
 
 import index_files
+import src.result_page_generator
+
 from retreival_models import BM25Model
 from retreival_models import TfIdfModel
 from tsv_reader import Tsv_Reader
 from retreival_models import *
-
-# TODO Generate a html file for search results
-def generate_search_results(rankings, filename):
-    return None
-
 
 def print_results(results_dict, n_hits, doc_lookup):
     results_sorted = sorted(results_dict.items(), key=lambda x: x[1], reverse=True)
@@ -43,8 +40,9 @@ def main():
         print("\nTF-IDF Rankings: ")
         print_results(TF_IDF_rankings, 60, doc_lookup)
 
-        generate_search_results(BM25_rankings, "BM25_results.html")
-        generate_search_results(TF_IDF_rankings, "TF_IDF_results.html")
+        src.result_page_generator.generate_html_page("TF_IDF_", query, TF_IDF_rankings)
+        src.result_page_generator.generate_html_page("BM25_", query, BM25_rankings)
+
 
         query = input("Enter Query (Input 'quit' to stop): ").strip()
 
