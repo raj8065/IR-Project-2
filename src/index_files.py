@@ -7,6 +7,8 @@ from nltk.tokenize import word_tokenize
 from tsv_reader import Tsv_Reader
 from posting import posting
 
+stop_words = ['the', 'am', 'is', 'and', 'be', 'of', 'to', 'it', 'I', 'on', 'a']
+
 
 def write_index_to_tsv(inverted_index):
   index_file = os.path.join(os.path.dirname(os.getcwd())+"\\res\\inverted_index.tsv")
@@ -45,7 +47,7 @@ def trim_word(word):
                 raise Exception("Word was trimmed and no capture groups were created. WORD: ", new_word)
             if capture_groups.lastindex > 1:
                 raise Exception("There was more than 1 capture group for a word. WORD: ", new_word)
-            return capture_groups.group(1)
+            return [x for x in capture_groups.group(1) if x not in stop_words]
     return ""
 
 
