@@ -101,6 +101,6 @@ def generate_html_page(file_name_prefix, query, top_rankings):
     generate_html_bottom(f)
     f.close()
 
-
-# Test case
-generate_html_page("The pie is beet red pinkie pie.",[0,1])
+if __name__ == "__main__":
+    # Test case
+    generate_html_page("BM25", "The pie is beet red, pinkie pie.", [0, 1, 7, 8, 3, 6, 4, 2, 24, 10])
