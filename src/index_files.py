@@ -48,7 +48,7 @@ def trim_word(word):
             if capture_groups.lastindex > 1:
                 raise Exception("There was more than 1 capture group for a word. WORD: ", new_word)
             term = capture_groups.group(1)
-            if term in stop_words:
+            if term.lower() in stop_words:
                 return ""
             return term
     return ""
