@@ -47,7 +47,10 @@ def trim_word(word):
                 raise Exception("Word was trimmed and no capture groups were created. WORD: ", new_word)
             if capture_groups.lastindex > 1:
                 raise Exception("There was more than 1 capture group for a word. WORD: ", new_word)
-            return [x for x in capture_groups.group(1) if x not in stop_words]
+            term = capture_groups.group(1)
+            if term in stop_words:
+                return ""
+            return term
     return ""
 
 
