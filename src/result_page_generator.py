@@ -50,7 +50,7 @@ def generate_hit_summary(query, doc):
 
 
 def generate_html_top(file, query):
-    top_top = "<div><a>&lt;Search Engine Name Here&gt;</a><div\"><form><input type=\"text\" value=\""
+    top_top = "<div><h1>My Little Pony Script Search Engine</h1><div\"><form><input type=\"text\" size=\"100\" value=\""
     bottom_top = "\" /><input type=\"submit\" value=\"Submit\" /></form></div></div>"
     file.write(top_top)
     file.write(html.escape(query))
