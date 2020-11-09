@@ -19,7 +19,7 @@ html_parser.py -> Generates the doc lookup and documents in the collection, need
 #### Other Files
 posting.py -> A class for holding inverted index information
 
-result_page_generator -> Creates the HTML pages
+result_page_generator.py -> Creates the HTML pages
 
 retreival_models.py -> Contains classes for retreival models that calculate rankings
 
